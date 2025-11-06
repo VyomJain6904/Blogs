@@ -8,17 +8,33 @@ import "overlayscrollbars/overlayscrollbars.css";
 
 <style is:global>
   :root {
-    --hue: 300;
+    /* Dracula Theme Colors */
+    --dracula-bg: #282a36;
+    --dracula-current: #44475a;
+    --dracula-selection: #44475a;
+    --dracula-foreground: #f8f8f2;
+    --dracula-comment: #6272a4;
+    --dracula-cyan: #8be9fd;
+    --dracula-green: #50fa7b;
+    --dracula-orange: #ffb86c;
+    --dracula-pink: #ff79c6;
+    --dracula-purple: #bd93f9;
+    --dracula-red: #ff5555;
+    --dracula-yellow: #f1fa8c;
 
-    --primary-color: oklch(70% 0.15 var(--hue));
-    --primary-color-lighten: oklch(95% 0.02 var(--hue));
-    --primary-color-hover: oklch(90% 0.025 var(--hue));
-    --primary-color-transparent: oklch(70% 0.15 var(--hue) / 15%);
-    --text-color: oklch(30% 0 0);
-    --text-color-lighten: oklch(50% 0 0);
-    --card-color: oklch(100% 0 0);
-    --card-color-transparent: oklch(100% 0 0 / 85%);
-    --background-color: oklch(97% 0.01 var(--hue));
+    /* Application Colors */
+    --hue: 265;
+
+    --primary-color: var(--dracula-purple);
+    --primary-color-lighten: rgba(189, 147, 249, 0.15);
+    --primary-color-hover: rgba(189, 147, 249, 0.25);
+    --primary-color-transparent: rgba(189, 147, 249, 0.15);
+    --text-color: var(--dracula-foreground);
+    --text-color-lighten: var(--dracula-comment);
+    --card-color: var(--dracula-current);
+    --card-color-lighten: #4a4d61;
+    --card-color-transparent: rgba(68, 71, 90, 0.85);
+    --background-color: var(--dracula-bg);
 
     --brand-font: "Raleway", "Noto Sans SC", sans-serif;
     --primary-font: "Noto Sans SC", sans-serif;
@@ -29,28 +45,43 @@ import "overlayscrollbars/overlayscrollbars.css";
 
     --banner-height: 55vh;
     --title-font: var(--brand-font);
-    --title-color: oklch(100% 0 0 / 95%);
+    --title-color: var(--dracula-foreground);
     --subtitle-font: var(--brand-font);
-    --subtitle-color: oklch(100% 0 0 / 85%);
+    --subtitle-color: var(--dracula-cyan);
 
     --onload-animation-delay: 100ms;
     --onload-animation-interval: 100ms;
   }
 
-  :root.dark {
-    --primary-color: oklch(70% 0.125 var(--hue));
-    --primary-color-lighten: oklch(40% 0.04 var(--hue));
-    --primary-color-hover: oklch(20% 0.015 var(--hue));
-    --text-color: oklch(95% 0.002 var(--hue));
-    --text-color-lighten: oklch(90% 0.002 var(--hue));
-    --card-color: oklch(25% 0.02 var(--hue));
-    --card-color-lighten: oklch(40% 0.04 var(--hue));
-    --card-color-transparent: oklch(30% 0.025 var(--hue) / 85%);
-    --background-color: oklch(17.5% 0.015 var(--hue));
+  body {
+    background-color: var(--background-color);
+    color: var(--text-color);
   }
 
   .swup-progress-bar {
     height: 5px;
     background-color: var(--primary-color);
+  }
+
+  /* Dracula-themed code blocks */
+  .astro-code,
+  pre {
+    background-color: var(--dracula-bg) !important;
+    border: 1px solid var(--dracula-current) !important;
+  }
+
+  code {
+    color: var(--dracula-pink) !important;
+    background-color: var(--dracula-current) !important;
+  }
+
+  /* Dracula-themed links */
+  a {
+    color: var(--dracula-cyan);
+    transition: color 0.3s ease;
+  }
+
+  a:hover {
+    color: var(--dracula-pink);
   }
 </style>

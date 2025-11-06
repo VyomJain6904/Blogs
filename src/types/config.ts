@@ -11,11 +11,12 @@ interface Configuration {
     sign: string;
     avatarUrl: string;
     socialLinks: { icon: string; link: string }[];
-    maxFooterCategoryChip: number;
-    maxFooterTagChip: number;
     banners: string[];
     slugMode: "HASH" | "RAW";
     bannerStyle: "LOOP";
+    adminEnabled?: boolean;
+    adminUsername?: string;
+    adminPassword?: string;
 }
 
 export type { Configuration };

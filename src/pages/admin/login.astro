@@ -1,0 +1,201 @@
+---
+import Main from "../../layouts/MainLayout.astro";
+import WriteupsConfig from "../../../geeklurk";
+
+if (!WriteupsConfig.adminEnabled) {
+  return Astro.redirect("/");
+}
+
+const sessionToken = Astro.cookies.get("admin_session")?.value;
+if (sessionToken) {
+  return Astro.redirect("/admin");
+}
+---
+
+<Main title="Admin Login" subTitle="Secure Access">
+  <div class="login-wrapper">
+    <div class="login-container">
+      <div class="login-header">
+        <h1 class="login-title">🔐 Admin Access</h1>
+        <p class="login-subtitle">Authorized Personnel Only</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            placeholder="Enter username"
+            required
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" class="login-btn" id="loginBtn">
+          <span>🚀 Login</span>
+        </button>
+
+        <div id="errorMessage" class="error-message"></div>
+        <div id="blockMessage" class="block-message"></div>
+      </form>
+
+      <div class="security-notice">
+        <p>⚠️ This area is monitored and protected</p>
+        <p class="notice-detail">
+          Unauthorized access attempts are logged and may result in IP blocking
+        </p>
+      </div>
+    </div>
+  </div>
+</Main>
+
+<style>
+  .login-wrapper {
+    @apply mx-3 flex items-center justify-center min-h-[60vh] lg:mx-0;
+  }
+
+  .login-container {
+    @apply w-full max-w-md rounded-2xl bg-[var(--card-color)] p-8 shadow-2xl border-2 border-[var(--primary-color)];
+  }
+
+  .login-header {
+    @apply text-center mb-8;
+  }
+
+  .login-title {
+    @apply text-3xl font-bold text-[var(--primary-color)] mb-2;
+    font-family: var(--brand-font);
+  }
+
+  .login-subtitle {
+    @apply text-[var(--text-color-lighten)] text-sm;
+    font-family: var(--primary-font);
+  }
+
+  .login-form {
+    @apply space-y-6;
+  }
+
+  .form-group {
+    @apply flex flex-col space-y-2;
+  }
+
+  .form-group label {
+    @apply text-sm font-semibold text-[var(--text-color)];
+    font-family: var(--primary-font);
+  }
+
+  .form-group input {
+    @apply w-full px-4 py-3 rounded-lg bg-[var(--background-color)] border-2 border-[var(--card-color-lighten)] text-[var(--text-color)] outline-none transition-all;
+    font-family: var(--primary-font);
+  }
+
+  .form-group input:focus {
+    @apply border-[var(--primary-color)] shadow-lg shadow-[var(--primary-color)]/20;
+  }
+
+  .login-btn {
+    @apply w-full px-6 py-4 rounded-lg bg-[var(--primary-color)] text-white font-bold text-lg transition-all hover:brightness-110 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    font-family: var(--primary-font);
+  }
+
+  .error-message {
+    @apply hidden p-4 rounded-lg bg-red-500/20 text-red-400 text-center text-sm;
+    font-family: var(--primary-font);
+  }
+
+  .error-message.show {
+    @apply block;
+  }
+
+  .block-message {
+    @apply hidden p-4 rounded-lg bg-orange-500/20 text-orange-400 text-center text-sm;
+    font-family: var(--primary-font);
+  }
+
+  .block-message.show {
+    @apply block;
+  }
+
+  .security-notice {
+    @apply mt-8 p-4 rounded-lg bg-[var(--background-color)] border-l-4 border-[var(--dracula-yellow)] text-center;
+  }
+
+  .security-notice p {
+    @apply text-[var(--dracula-yellow)] font-semibold text-sm;
+    font-family: var(--primary-font);
+  }
+
+  .notice-detail {
+    @apply text-[var(--text-color-lighten)] text-xs mt-1;
+  }
+</style>
+
+<script>
+  const form = document.getElementById("loginForm") as HTMLFormElement;
+  const loginBtn = document.getElementById("loginBtn") as HTMLButtonElement;
+  const errorMessage = document.getElementById("errorMessage") as HTMLDivElement;
+  const blockMessage = document.getElementById("blockMessage") as HTMLDivElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+
+    // Clear previous messages
+    errorMessage.classList.remove("show");
+    blockMessage.classList.remove("show");
+
+    // Disable button
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = "<span>🔄 Authenticating...</span>";
+
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Successful login
+        window.location.href = "/admin";
+      } else if (response.status === 403) {
+        // Blocked
+        blockMessage.textContent = result.error;
+        blockMessage.classList.add("show");
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = "<span>🚀 Login</span>";
+      } else {
+        // Failed login
+        errorMessage.textContent = result.error || "Invalid credentials";
+        errorMessage.classList.add("show");
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = "<span>🚀 Login</span>";
+      }
+    } catch (error) {
+      errorMessage.textContent = "Network error. Please try again.";
+      errorMessage.classList.add("show");
+      loginBtn.disabled = false;
+      loginBtn.innerHTML = "<span>🚀 Login</span>";
+    }
+  });
+</script>

@@ -5,24 +5,20 @@ enum Keys {
 
     nav_bar_home = "nav_bar_home",
     nav_bar_writeups = "nav_bar_writeups",
-    nav_bar_github = "nav_bar_github",
+    nav_bar_about = "nav_bar_about",
     nav_bar_search_placeholder = "nav_bar_search_placeholder",
 
     post_card_words = "post_card_words",
     post_card_minutes = "post_card_minutes",
 
-    side_bar_categories = "side_bar_categories",
-    side_bar_tags = "side_bar_tags",
-    side_bar_view_more = "side_bar_view_more",
+    pages_writeups_title = "pages_writeups_title",
 
-    archive_year_title_count = "archive_year_title_count",
-
-    pages_categories_archive = "pages_categories_archive",
-    pages_archive_archive = "pages_archive_archive",
-    pages_tags_archive = "pages_tags_archive",
-
-    pages_tags_title = "pages_tags_title",
-    pages_categories_title = "pages_categories_title",
+    reaction_like = "reaction_like",
+    reaction_love = "reaction_love",
+    reaction_fire = "reaction_fire",
+    comments_title = "comments_title",
+    comments_placeholder = "comments_placeholder",
+    comments_submit = "comments_submit",
 }
 
 export default Keys;

@@ -1,13 +1,14 @@
 import Keys from "./src/locales/keys";
 import type { Configuration } from "./src/types/config";
 
-const WriteupsConfig : Configuration = {
-    title: "g€€k !urk",
-    subTitle: "",
+const WriteupsConfig: Configuration = {
+    title: "G€€k !urk",
+    subTitle: "Security Writeups and Notes",
 
-    description: "writeups about security",
+    description:
+        "Security Writeups and Notes",
 
-    site: "https://yukina-blog.vercel.app",
+    site: "https://geeklurk.vercel.app",
 
     locale: "en",
 
@@ -21,12 +22,12 @@ const WriteupsConfig : Configuration = {
             href: "/writeups",
         },
         {
-            nameKey: Keys.nav_bar_github,
-            href: "https://github.com/VyomJain6904",
+            nameKey: Keys.nav_bar_about,
+            href: "/about",
         },
     ],
 
-    username: "g€€k !urk",
+    username: "G€€k !urk",
     sign: "Security Engineer",
     avatarUrl: "./assets/avatar.jpg",
     socialLinks: [
@@ -35,9 +36,6 @@ const WriteupsConfig : Configuration = {
             link: "https://github.com/VyomJain6904",
         },
     ],
-
-    maxFooterCategoryChip: 6,
-    maxFooterTagChip: 24,
 
     banners: [
         "./assets/banner1.jpg",
@@ -51,8 +49,11 @@ const WriteupsConfig : Configuration = {
     ],
 
     slugMode: "HASH",
-
     bannerStyle: "LOOP",
+
+    adminEnabled: true,
+    adminUsername: "g€€k!urk",
+    adminPassword: process.env.ADMIN_PASSWORD,
 };
 
 export default WriteupsConfig;

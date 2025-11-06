@@ -1,0 +1,313 @@
+---
+import Main from "../../layouts/MainLayout.astro";
+import WriteupsConfig from "../../../geeklurk";
+import { activeSessions } from "../../middleware";
+
+// Check if admin is enabled
+if (!WriteupsConfig.adminEnabled) {
+  return Astro.redirect("/");
+}
+
+// Check authentication
+const sessionToken = Astro.cookies.get("admin_session")?.value;
+if (!sessionToken || !activeSessions.has(sessionToken)) {
+  return Astro.redirect("/admin/login");
+}
+
+const session = activeSessions.get(sessionToken);
+const username = session?.username || "Admin";
+---
+
+<Main title="Admin Panel" subTitle="Upload Writeups">
+  <div class="admin-panel">
+    <div class="admin-container">
+      <div class="admin-header">
+        <div>
+          <h1 class="admin-title">📝 Upload Writeup</h1>
+          <p class="welcome-text">Welcome back, <span class="username-highlight">{username}</span></p>
+        </div>
+        <button id="logoutBtn" class="logout-btn">
+          <span>🚪 Logout</span>
+        </button>
+      </div>
+
+      <div class="upload-section">
+        <form id="uploadForm" class="upload-form">
+          <!-- Markdown File Upload -->
+          <div class="form-group">
+            <label for="mdFile">Markdown File (.md)</label>
+            <input
+              type="file"
+              id="mdFile"
+              name="mdFile"
+              accept=".md"
+              required
+            />
+            <p class="hint">Upload your writeup in Markdown format</p>
+          </div>
+
+          <!-- Images Upload -->
+          <div class="form-group">
+            <label for="images">Images/Screenshots</label>
+            <input
+              type="file"
+              id="images"
+              name="images"
+              accept="image/*"
+              multiple
+            />
+            <p class="hint">Upload POC screenshots and images (optional)</p>
+          </div>
+
+          <!-- Cover Image -->
+          <div class="form-group">
+            <label for="coverImage">Cover Image</label>
+            <input
+              type="file"
+              id="coverImage"
+              name="coverImage"
+              accept="image/*"
+            />
+            <p class="hint">Optional cover image for the writeup</p>
+          </div>
+
+          <!-- Metadata -->
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              placeholder="e.g., HackTheBox - Cap Machine Walkthrough"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              rows="3"
+              placeholder="Brief description of the writeup..."
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="difficulty">Difficulty</label>
+              <select id="difficulty" name="difficulty">
+                <option value="">Select...</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+                <option value="Insane">Insane</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="platform">Platform</label>
+              <input
+                type="text"
+                id="platform"
+                name="platform"
+                placeholder="e.g., HackTheBox, TryHackMe"
+              />
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn">
+            <span>🚀 Upload Writeup</span>
+          </button>
+
+          <div id="uploadStatus" class="upload-status"></div>
+        </form>
+
+        <!-- Preview Section -->
+        <div class="preview-section">
+          <h2>📄 Preview</h2>
+          <div id="previewContent" class="preview-content">
+            Select a markdown file to preview...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Main>
+
+<style>
+  .admin-panel {
+    @apply mx-3 rounded-2xl bg-[var(--card-color)] p-6 lg:mx-0 lg:p-10;
+  }
+
+  .admin-container {
+    @apply w-full max-w-6xl mx-auto;
+  }
+
+  .admin-header {
+    @apply flex items-center justify-between mb-8;
+  }
+
+  .admin-title {
+    @apply text-3xl font-bold text-[var(--text-color)] mb-2;
+    font-family: var(--brand-font);
+  }
+
+  .welcome-text {
+    @apply text-sm text-[var(--text-color-lighten)];
+    font-family: var(--primary-font);
+  }
+
+  .username-highlight {
+    @apply text-[var(--primary-color)] font-bold;
+  }
+
+  .logout-btn {
+    @apply px-4 py-2 rounded-lg bg-red-500/20 border-2 border-red-500 text-red-400 font-bold transition-all hover:bg-red-500/30 active:scale-95;
+    font-family: var(--primary-font);
+  }
+
+  .upload-section {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-8;
+  }
+
+  .upload-form {
+    @apply flex flex-col space-y-6;
+  }
+
+  .form-group {
+    @apply flex flex-col space-y-2;
+  }
+
+  .form-group label {
+    @apply text-sm font-semibold text-[var(--text-color)];
+    font-family: var(--primary-font);
+  }
+
+  .form-group input[type="text"],
+  .form-group input[type="password"],
+  .form-group textarea,
+  .form-group select {
+    @apply w-full px-4 py-3 rounded-lg bg-[var(--background-color)] border-2 border-[var(--card-color-lighten)] text-[var(--text-color)] outline-none transition-all;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    @apply border-[var(--primary-color)];
+  }
+
+  .form-group input[type="file"] {
+    @apply w-full px-4 py-3 rounded-lg bg-[var(--background-color)] border-2 border-dashed border-[var(--card-color-lighten)] text-[var(--text-color)] cursor-pointer transition-all;
+  }
+
+  .form-group input[type="file"]:hover {
+    @apply border-[var(--primary-color)];
+  }
+
+  .hint {
+    @apply text-xs text-[var(--text-color-lighten)] italic;
+  }
+
+  .form-row {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+
+  .submit-btn {
+    @apply w-full px-6 py-4 rounded-lg bg-[var(--primary-color)] text-white font-bold text-lg transition-all hover:brightness-110 active:scale-95;
+    font-family: var(--primary-font);
+  }
+
+  .upload-status {
+    @apply p-4 rounded-lg text-center hidden;
+  }
+
+  .upload-status.success {
+    @apply block bg-green-500/20 text-green-400;
+  }
+
+  .upload-status.error {
+    @apply block bg-red-500/20 text-red-400;
+  }
+
+  .preview-section {
+    @apply flex flex-col space-y-4;
+  }
+
+  .preview-section h2 {
+    @apply text-2xl font-bold text-[var(--text-color)];
+    font-family: var(--brand-font);
+  }
+
+  .preview-content {
+    @apply p-6 rounded-lg bg-[var(--background-color)] border-2 border-[var(--card-color-lighten)] min-h-[400px] max-h-[600px] overflow-y-auto;
+    font-family: var(--code-font);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+</style>
+
+<script>
+  const form = document.getElementById('uploadForm') as HTMLFormElement;
+  const mdFileInput = document.getElementById('mdFile') as HTMLInputElement;
+  const previewContent = document.getElementById('previewContent') as HTMLDivElement;
+  const uploadStatus = document.getElementById('uploadStatus') as HTMLDivElement;
+  const logoutBtn = document.getElementById('logoutBtn') as HTMLButtonElement;
+
+  // Logout handler
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const response = await fetch('/api/admin/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        window.location.href = '/admin/login';
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  });
+
+  // Preview markdown file
+  mdFileInput.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (file) {
+      const text = await file.text();
+      previewContent.innerHTML = `<pre>${text}</pre>`;
+    }
+  });
+
+  // Handle form submission
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    uploadStatus.className = 'upload-status';
+    uploadStatus.textContent = 'Uploading...';
+    uploadStatus.classList.add('block');
+
+    try {
+      const response = await fetch('/api/upload-writeup', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        uploadStatus.className = 'upload-status success';
+        uploadStatus.textContent = '✅ Writeup uploaded successfully!';
+        form.reset();
+        previewContent.textContent = 'Select a markdown file to preview...';
+      } else {
+        throw new Error(result.error || 'Upload failed');
+      }
+    } catch (error) {
+      uploadStatus.className = 'upload-status error';
+      uploadStatus.textContent = `❌ Error: ${error.message}`;
+    }
+  });
+</script>

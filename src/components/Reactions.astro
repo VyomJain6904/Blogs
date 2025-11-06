@@ -1,0 +1,269 @@
+---
+import Keys from "../locales/keys";
+import { locallang } from "../locales/translation";
+
+export interface Props {
+  postId: string;
+}
+
+const { postId } = Astro.props;
+---
+
+<div class="reactions-section">
+  <!-- Reactions -->
+  <div class="reactions-container">
+    <h3 class="section-title">💬 Reactions</h3>
+    <div class="reactions-buttons">
+      <button class="reaction-btn" data-reaction="like" data-post-id={postId}>
+        <span class="reaction-icon">👍</span>
+        <span class="reaction-count" id="like-count">0</span>
+      </button>
+      <button class="reaction-btn" data-reaction="love" data-post-id={postId}>
+        <span class="reaction-icon">❤️</span>
+        <span class="reaction-count" id="love-count">0</span>
+      </button>
+      <button class="reaction-btn" data-reaction="fire" data-post-id={postId}>
+        <span class="reaction-icon">🔥</span>
+        <span class="reaction-count" id="fire-count">0</span>
+      </button>
+      <button class="reaction-btn" data-reaction="mind" data-post-id={postId}>
+        <span class="reaction-icon">🤯</span>
+        <span class="reaction-count" id="mind-count">0</span>
+      </button>
+      <button class="reaction-btn" data-reaction="hacker" data-post-id={postId}>
+        <span class="reaction-icon">👨‍💻</span>
+        <span class="reaction-count" id="hacker-count">0</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Comments Section -->
+  <div class="comments-container">
+    <h3 class="section-title">💭 {locallang(Keys.comments_title)}</h3>
+
+    <!-- Comment Form -->
+    <form id="commentForm" class="comment-form">
+      <input type="hidden" name="postId" value={postId} />
+      <div class="form-group">
+        <input
+          type="text"
+          name="username"
+          placeholder="Your name (optional)"
+          class="comment-input"
+        />
+      </div>
+      <div class="form-group">
+        <textarea
+          name="comment"
+          placeholder={locallang(Keys.comments_placeholder)}
+          rows="4"
+          required
+          class="comment-textarea"
+        ></textarea>
+      </div>
+      <button type="submit" class="submit-btn">
+        {locallang(Keys.comments_submit)}
+      </button>
+    </form>
+
+    <!-- Comments List -->
+    <div id="commentsList" class="comments-list">
+      <!-- Comments will be loaded here -->
+    </div>
+  </div>
+</div>
+
+<style>
+  .reactions-section {
+    @apply mt-12 space-y-8;
+  }
+
+  .reactions-container {
+    @apply rounded-xl bg-[var(--card-color)] p-6;
+  }
+
+  .section-title {
+    @apply text-xl font-bold text-[var(--text-color)] mb-4;
+    font-family: var(--brand-font);
+  }
+
+  .reactions-buttons {
+    @apply flex flex-wrap gap-3;
+  }
+
+  .reaction-btn {
+    @apply flex items-center space-x-2 px-4 py-2 rounded-lg bg-[var(--background-color)] border-2 border-[var(--card-color-lighten)] transition-all hover:border-[var(--primary-color)] hover:scale-105 active:scale-95 cursor-pointer;
+  }
+
+  .reaction-btn.active {
+    @apply border-[var(--primary-color)] bg-[var(--primary-color-lighten)];
+  }
+
+  .reaction-icon {
+    @apply text-2xl;
+  }
+
+  .reaction-count {
+    @apply text-sm font-bold text-[var(--text-color)];
+    font-family: var(--primary-font);
+  }
+
+  .comments-container {
+    @apply rounded-xl bg-[var(--card-color)] p-6;
+  }
+
+  .comment-form {
+    @apply space-y-4 mb-8;
+  }
+
+  .form-group {
+    @apply w-full;
+  }
+
+  .comment-input,
+  .comment-textarea {
+    @apply w-full px-4 py-3 rounded-lg bg-[var(--background-color)] border-2 border-[var(--card-color-lighten)] text-[var(--text-color)] outline-none transition-all;
+    font-family: var(--primary-font);
+  }
+
+  .comment-input:focus,
+  .comment-textarea:focus {
+    @apply border-[var(--primary-color)];
+  }
+
+  .submit-btn {
+    @apply px-6 py-3 rounded-lg bg-[var(--primary-color)] text-white font-bold transition-all hover:brightness-110 active:scale-95;
+    font-family: var(--primary-font);
+  }
+
+  .comments-list {
+    @apply space-y-4;
+  }
+
+  .comment-item {
+    @apply p-4 rounded-lg bg-[var(--background-color)] border-l-4 border-[var(--primary-color)];
+  }
+
+  .comment-header {
+    @apply flex items-center justify-between mb-2;
+  }
+
+  .comment-author {
+    @apply font-bold text-[var(--primary-color)];
+    font-family: var(--primary-font);
+  }
+
+  .comment-date {
+    @apply text-xs text-[var(--text-color-lighten)];
+  }
+
+  .comment-text {
+    @apply text-[var(--text-color)] leading-relaxed;
+    font-family: var(--primary-font);
+  }
+</style>
+
+<script>
+  // Load reactions count
+  async function loadReactions(postId: string) {
+    try {
+      const response = await fetch(`/api/reactions/${postId}`);
+      const data = await response.json();
+
+      Object.keys(data).forEach(reaction => {
+        const countEl = document.getElementById(`${reaction}-count`);
+        if (countEl) {
+          countEl.textContent = data[reaction].toString();
+        }
+      });
+    } catch (error) {
+      console.error('Failed to load reactions:', error);
+    }
+  }
+
+  // Handle reaction click
+  document.querySelectorAll('.reaction-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const button = e.currentTarget as HTMLElement;
+      const reaction = button.dataset.reaction;
+      const postId = button.dataset.postId;
+
+      try {
+        const response = await fetch('/api/reactions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId, reaction })
+        });
+
+        if (response.ok) {
+          button.classList.add('active');
+          const countEl = button.querySelector('.reaction-count');
+          if (countEl) {
+            const currentCount = parseInt(countEl.textContent || '0');
+            countEl.textContent = (currentCount + 1).toString();
+          }
+        }
+      } catch (error) {
+        console.error('Failed to submit reaction:', error);
+      }
+    });
+  });
+
+  // Load comments
+  async function loadComments(postId: string) {
+    try {
+      const response = await fetch(`/api/comments/${postId}`);
+      const comments = await response.json();
+
+      const commentsList = document.getElementById('commentsList');
+      if (commentsList && comments.length > 0) {
+        commentsList.innerHTML = comments.map((comment: any) => `
+          <div class="comment-item">
+            <div class="comment-header">
+              <span class="comment-author">${comment.username || 'Anonymous'}</span>
+              <span class="comment-date">${new Date(comment.date).toLocaleDateString()}</span>
+            </div>
+            <p class="comment-text">${comment.text}</p>
+          </div>
+        `).join('');
+      }
+    } catch (error) {
+      console.error('Failed to load comments:', error);
+    }
+  }
+
+  // Handle comment submission
+  const commentForm = document.getElementById('commentForm') as HTMLFormElement;
+  commentForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(commentForm);
+    const data = {
+      postId: formData.get('postId'),
+      username: formData.get('username') || 'Anonymous',
+      text: formData.get('comment')
+    };
+
+    try {
+      const response = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        commentForm.reset();
+        loadComments(data.postId as string);
+      }
+    } catch (error) {
+      console.error('Failed to submit comment:', error);
+    }
+  });
+
+  // Initialize on page load
+  const postId = commentForm?.querySelector('[name="postId"]')?.value;
+  if (postId) {
+    loadReactions(postId);
+    loadComments(postId);
+  }
+</script>
