@@ -1,0 +1,21 @@
+---
+import PostArchiveLayout from "../../layouts/PostArchiveLayout.astro";
+import Keys from "../../locales/keys";
+import { locallang } from "../../locales/translation";
+
+export async function getStaticPaths() {
+}
+
+/**
+ * Formats an archive map of posts associated with a specified category.
+ *
+ * The function retrieves a list of posts and groups them by their publication
+ * year, storing them in a Map where each key is a year (number) and the value
+ * is an array of posts. It also retrieves the category’s display name.
+ *
+ * @returns An object containing:
+ *     - archiveMap {Map<number, Array<Archive>>} A map of year to array of posts.
+ *     - categoryName {string} The display-friendly name of the category.
+ */
+
+---
