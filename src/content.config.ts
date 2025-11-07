@@ -18,6 +18,9 @@ const posts = defineCollection({
         sourceLink: z.string().optional(),
         licenseName: z.string().optional(),
         licenseUrl: z.string().optional(),
+        platform: z.string().optional(),
+        platformAvatar: z.string().optional(),
+        difficulty: z.string().optional(),
     }),
 });
 

@@ -5,64 +5,64 @@ import PostLayout from "../../layouts/PostLayout.astro";
 import { render } from "astro:content";
 
 export async function getStaticPaths() {
-  const postEntries = await getCollection("posts");
-  return postEntries.map((entry) => ({
-    params: { slug: IdToSlug(entry.id) },
-    props: { entry },
-  }));
+    const postEntries = await getCollection("posts");
+    return postEntries.map((entry) => ({
+        params: { slug: IdToSlug(entry.id) },
+        props: { entry },
+    }));
 }
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const postId = IdToSlug(entry.id);
 ---
 
 {
-  !entry.data.licenseName && (
-    <PostLayout
-      title={entry.data.title}
-      subTitle={entry.data.description}
-      bannerImage={entry.data.cover}
-      published={entry.data.published}
-      postId={postId}
-    >
-      <div
-        class="hidden"
-        data-pagefind-body
-        data-pagefind-weight="10"
-        data-pagefind-meta="title"
-      >
-        {entry.data.title}
-      </div>
-      <div data-pagefind-body>
-        <Content />
-      </div>
-    </PostLayout>
-  )
+    !entry.data.licenseName && (
+        <PostLayout
+            title={entry.data.title}
+            subTitle={entry.data.description}
+            bannerImage={entry.data.cover}
+            published={entry.data.published}
+        >
+            <div
+                class="hidden"
+                data-pagefind-body
+                data-pagefind-weight="10"
+                data-pagefind-meta="title"
+            >
+                {entry.data.title}
+            </div>
+            <div data-pagefind-body>
+                <Content />
+            </div>
+        </PostLayout>
+    )
 }
 {
-  entry.data.licenseName && (
-    <PostLayout
-      title={entry.data.title}
-      subTitle={entry.data.description}
-      bannerImage={entry.data.cover}
-      published={entry.data.published}
-      license={{ name: entry.data.licenseName, url: entry.data.licenseUrl }}
-      author={entry.data.author}
-      sourceLink={entry.data.sourceLink}
-      postId={postId}
-    >
-      <div
-        class="hidden"
-        data-pagefind-body
-        data-pagefind-weight="10"
-        data-pagefind-meta="title"
-      >
-        {entry.data.title}
-      </div>
-      <div data-pagefind-body>
-        <Content />
-      </div>
-    </PostLayout>
-  )
+    entry.data.licenseName && (
+        <PostLayout
+            title={entry.data.title}
+            subTitle={entry.data.description}
+            bannerImage={entry.data.cover}
+            published={entry.data.published}
+            license={{
+                name: entry.data.licenseName,
+                url: entry.data.licenseUrl,
+            }}
+            author={entry.data.author}
+            sourceLink={entry.data.sourceLink}
+        >
+            <div
+                class="hidden"
+                data-pagefind-body
+                data-pagefind-weight="10"
+                data-pagefind-meta="title"
+            >
+                {entry.data.title}
+            </div>
+            <div data-pagefind-body>
+                <Content />
+            </div>
+        </PostLayout>
+    )
 }

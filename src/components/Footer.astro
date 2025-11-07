@@ -3,30 +3,31 @@ import WriteupsConfig from "../../geeklurk";
 ---
 
 <div class="mx-3">
-  <!-- Site footer -->
-  <footer>
-    <div class="divide-y divide-dashed divide-black/25 py-4 lg:pt-0 dark:divide-white/25">
-      <div></div>
-      <div></div>
-    </div>
-    <div class="flex w-full flex-col items-center text-sm text-[var(--text-color-lighten)] space-y-2">
-      <p>
-        © {new Date().getFullYear()} {WriteupsConfig.username} All Rights Reserved.
-      </p>
-      <p>
-        Built with <span class="text-[var(--primary-color)]">♥</span> for Security Research
-      </p>
-      <p class="flex space-x-2">
-        <a class="link" href={new URL("sitemap-index.xml", WriteupsConfig.site)}>SiteMap</a>
-        <span>•</span>
-        <a class="link" href="/rss.xml">RSS</a>
-      </p>
-    </div>
-  </footer>
+    <!-- Site footer -->
+    <footer>
+        <div
+            class="divide-y divide-dashed divide-black/25 py-4 lg:pt-0 dark:divide-white/25"
+        >
+            <div></div>
+            <div></div>
+        </div>
+        <div
+            class="flex w-full flex-col items-center text-sm text-[var(--text-color-lighten)] space-y-2"
+        >
+            <p>
+                © {new Date().getFullYear()}
+                {WriteupsConfig.username} All Rights Reserved.
+            </p>
+            <p>
+                Built with <span class="text-[var(--primary-color)]"> ♥  </span> for
+                Security Research
+            </p>
+        </div>
+    </footer>
 </div>
 
 <style>
-  .link {
-    @apply text-[var(--primary-color)] transition-all hover:brightness-110;
-  }
+    .link {
+        @apply text-[var(--primary-color)] transition-all hover:brightness-110;
+    }
 </style>

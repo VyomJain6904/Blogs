@@ -53,6 +53,15 @@
         "licenseUrl": {
           "type": "string"
         },
+        "platform": {
+          "type": "string"
+        },
+        "platformAvatar": {
+          "type": "string"
+        },
+        "difficulty": {
+          "type": "string"
+        },
         "$schema": {
           "type": "string"
         }

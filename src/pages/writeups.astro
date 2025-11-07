@@ -1,26 +1,19 @@
 ---
 import Main from "../layouts/MainLayout.astro";
 import PostCard from "../components/PostCard.astro";
-import Pagination from "../components/controllers/Pagination.astro";
-import type { PaginateFunction } from "astro";
 import { GetSortedPosts } from "../utils/content";
 
-export async function getStaticPaths({
-    paginate,
-}: {
-    paginate: PaginateFunction;
-}) {
-    const postCollections = await GetSortedPosts();
-    return paginate(postCollections, { pageSize: 6 });
-}
-const { page } = Astro.props;
+const posts = await GetSortedPosts();
 ---
 
-<Main>
-    <div class="space-y-8">
-        <div class="grid-container">
+<Main
+    title="Security Writeups"
+    subTitle="CTF Walkthroughs & Penetration Testing Documentation"
+>
+    <div class="writeups-container">
+        <div class="grid-layout">
             {
-                page.data.map((entry, index) => (
+                posts.map((entry, index) => (
                     <div
                         class="onload-animation"
                         style={`animation-delay: calc(var(--onload-animation-delay) + ${index + 1} * var(--onload-animation-interval));`}
@@ -45,19 +38,15 @@ const { page } = Astro.props;
                 ))
             }
         </div>
-        <Pagination
-            class="onload-animation"
-            lastPage={page.lastPage}
-            current={page.currentPage}
-            prevURL={page.url.prev}
-            nextURL={page.url.next}
-            style={`animation-delay: calc(var(--onload-animation-delay) + ${page.data.length + 1} * var(--onload-animation-interval));`}
-        />
     </div>
 </Main>
 
 <style>
-    .grid-container {
+    .writeups-container {
+        @apply mx-3 lg:mx-0;
+    }
+
+    .grid-layout {
         @apply grid grid-cols-1 md:grid-cols-2 gap-6 w-full;
     }
 </style>

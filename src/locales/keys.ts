@@ -16,9 +16,6 @@ enum Keys {
     reaction_like = "reaction_like",
     reaction_love = "reaction_love",
     reaction_fire = "reaction_fire",
-    comments_title = "comments_title",
-    comments_placeholder = "comments_placeholder",
-    comments_submit = "comments_submit",
 }
 
 export default Keys;

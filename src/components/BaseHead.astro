@@ -12,49 +12,21 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <meta name="generator" content={Astro.generator} />
 
-<!-- Canonical URL -->
-<link rel="canonical" href={canonicalURL} />
-
 <!-- Primary Meta Tags -->
 <title>{WriteupsConfig.title}</title>
 <meta name="title" content={WriteupsConfig.title} />
 <meta name="description" content={WriteupsConfig.description} />
 
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content={Astro.url} />
-<meta property="og:title" content={WriteupsConfig.title} />
-<meta property="og:description" content={WriteupsConfig.description} />
-<!-- <meta property="og:image" content={new URL(image, Astro.url)} /> -->
-
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={WriteupsConfig.title} />
-<meta property="twitter:description" content={WriteupsConfig.description} />
-<!-- <meta property="twitter:image" content={new URL(image, Astro.url)} /> -->
-
-<!-- RSS AutoDiscovery -->
-<link
-  rel="alternate"
-  type="application/rss+xml"
-  title={WriteupsConfig.title}
-  href={new URL("rss.xml", Astro.site)}
-/>
-
-<!-- SiteMap -->
-<link rel="sitemap" href="/sitemap-index.xml" />
-
 <!-- CSS -->
 <link
-  rel="stylesheet"
-  href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
+    rel="stylesheet"
+    href="https://fastly.jsdelivr.net/npm/katex/dist/katex.min.css"
 />
 <!-- Fonts -->
-<link rel="preconnect" href="https://fonts.bunny.net" />
 <link
-  href="https://fonts.bunny.net/css?family=noto-sans-sc:100,200,300,400,500,600,700,800,900|raleway:500,700"
-  rel="stylesheet"
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/ryanoasis/nerd-fonts@master/patched-fonts/JetBrainsMono/Ligatures/Regular/complete/JetBrains%20Mono%20Regular%20Nerd%20Font%20Complete.ttf"
+    rel="stylesheet"
 />
 
 <GlobalStyles />

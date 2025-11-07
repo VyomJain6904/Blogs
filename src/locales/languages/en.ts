@@ -1,7 +1,7 @@
 import type { Translation } from "../translation";
 import key from "../keys";
 
-export const en: Translation = {
+export const en : Translation = {
     [key.copy_right_author]: "Author",
     [key.copy_right_publish_date]: "Publish Date",
     [key.copy_right_license]: "License",
@@ -19,7 +19,4 @@ export const en: Translation = {
     [key.reaction_like]: "Like",
     [key.reaction_love]: "Love",
     [key.reaction_fire]: "Fire",
-    [key.comments_title]: "Comments",
-    [key.comments_placeholder]: "Share your thoughts...",
-    [key.comments_submit]: "Submit",
 };

@@ -3,14 +3,12 @@ import WriteupsConfig from "../../../geeklurk";
 import { activeSessions } from "../../middleware";
 import fs from "fs/promises";
 import path from "path";
-import crypto from "crypto";
 
-// File size limits
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB per image
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_AVATAR_SIZE = 2 * 1024 * 1024;
 const MAX_IMAGES = 20;
 
-// Allowed MIME types
 const ALLOWED_IMAGE_TYPES = [
     "image/jpeg",
     "image/jpg",
@@ -28,20 +26,14 @@ function sanitizeFilename(filename: string): string {
 }
 
 function sanitizeMarkdown(content: string): string {
-    // Remove potential script tags
     let cleaned = content.replace(
         /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
         ""
     );
-
-    // Remove dangerous protocols
     cleaned = cleaned.replace(/javascript:/gi, "");
     cleaned = cleaned.replace(/data:text\/html/gi, "");
     cleaned = cleaned.replace(/vbscript:/gi, "");
-
-    // Remove on* event handlers
     cleaned = cleaned.replace(/on\w+\s*=\s*["'][^"']*["']/gi, "");
-
     return cleaned;
 }
 
@@ -59,16 +51,18 @@ function sanitizeString(input: string): string {
         .trim();
 }
 
-function validateImageFile(file: File): { valid: boolean; error?: string } {
-    if (file.size > MAX_IMAGE_SIZE) {
-        return { valid: false, error: `Image ${file.name} exceeds 5MB limit` };
+function validateImageFile(
+    file: File,
+    maxSize: number
+): { valid: boolean; error?: string } {
+    if (file.size > maxSize) {
+        return { valid: false, error: `Image ${file.name} exceeds size limit` };
     }
 
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
         return { valid: false, error: `Invalid image type: ${file.type}` };
     }
 
-    // Check for double extensions
     const filename = file.name.toLowerCase();
     if (filename.match(/\.(php|exe|sh|bat|cmd|js|html|htm)\./)) {
         return { valid: false, error: "Suspicious file extension detected" };
@@ -78,7 +72,6 @@ function validateImageFile(file: File): { valid: boolean; error?: string } {
 }
 
 async function verifyImageContent(buffer: Buffer): Promise<boolean> {
-    // Check magic numbers for common image formats
     const magicNumbers: { [key: string]: number[] } = {
         jpeg: [0xff, 0xd8, 0xff],
         png: [0x89, 0x50, 0x4e, 0x47],
@@ -86,7 +79,7 @@ async function verifyImageContent(buffer: Buffer): Promise<boolean> {
         webp: [0x52, 0x49, 0x46, 0x46],
     };
 
-    for (const [format, magic] of Object.entries(magicNumbers)) {
+    for (const magic of Object.values(magicNumbers)) {
         if (magic.every((byte, i) => buffer[i] === byte)) {
             return true;
         }
@@ -105,7 +98,6 @@ function generateSlug(title: string): string {
 
 export const POST: APIRoute = async ({ request, cookies }) => {
     try {
-        // Verify session
         const sessionToken = cookies.get("admin_session")?.value;
         if (!sessionToken || !activeSessions.has(sessionToken)) {
             return new Response(JSON.stringify({ error: "Unauthorized" }), {
@@ -114,7 +106,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             });
         }
 
-        // Check content length
         const contentLength = request.headers.get("content-length");
         if (contentLength && parseInt(contentLength) > MAX_FILE_SIZE) {
             return new Response(
@@ -125,30 +116,31 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
         const formData = await request.formData();
 
-        // Get and validate form data
         const mdFile = formData.get("mdFile") as File;
         const title = sanitizeString(formData.get("title") as string);
         const description = sanitizeString(
             (formData.get("description") as string) || ""
         );
-        const difficulty = sanitizeString(
-            (formData.get("difficulty") as string) || ""
-        );
         const platform = sanitizeString(
             (formData.get("platform") as string) || ""
         );
+        const difficulty = sanitizeString(
+            (formData.get("difficulty") as string) || ""
+        );
+        const category = sanitizeString(
+            (formData.get("category") as string) || ""
+        );
+        const platformAvatar = formData.get("platformAvatar") as File | null;
         const coverImage = formData.get("coverImage") as File | null;
         const images = formData.getAll("images") as File[];
 
-        // Validation
-        if (!mdFile || !title) {
+        if (!mdFile || !title || !platform || !difficulty) {
             return new Response(
                 JSON.stringify({ error: "Missing required fields" }),
                 { status: 400, headers: { "Content-Type": "application/json" } }
             );
         }
 
-        // Validate markdown file
         if (!mdFile.name.endsWith(".md")) {
             return new Response(
                 JSON.stringify({ error: "Invalid file type. Must be .md" }),
@@ -163,7 +155,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             );
         }
 
-        // Validate title length
         if (title.length < 3 || title.length > 200) {
             return new Response(
                 JSON.stringify({ error: "Title must be 3-200 characters" }),
@@ -171,7 +162,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             );
         }
 
-        // Check number of images
         if (images.length > MAX_IMAGES) {
             return new Response(
                 JSON.stringify({
@@ -181,11 +171,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             );
         }
 
-        // Read and sanitize markdown content
         let mdContent = await mdFile.text();
         mdContent = sanitizeMarkdown(mdContent);
 
-        // Generate secure slug
         const slug = generateSlug(title);
         const writeupDir = path.join(
             process.cwd(),
@@ -195,7 +183,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             slug
         );
 
-        // Check if writeup already exists
         try {
             await fs.access(writeupDir);
             return new Response(
@@ -208,13 +195,52 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             // Directory doesn't exist, proceed
         }
 
-        // Create writeup directory
         await fs.mkdir(writeupDir, { recursive: true });
 
-        // Process cover image
+        let platformAvatarPath = "";
+        if (platformAvatar && platformAvatar.size > 0) {
+            const validation = validateImageFile(
+                platformAvatar,
+                MAX_AVATAR_SIZE
+            );
+            if (!validation.valid) {
+                return new Response(
+                    JSON.stringify({ error: validation.error }),
+                    {
+                        status: 400,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+            }
+
+            const avatarBuffer = Buffer.from(
+                await platformAvatar.arrayBuffer()
+            );
+            if (!(await verifyImageContent(avatarBuffer))) {
+                return new Response(
+                    JSON.stringify({ error: "Invalid platform avatar format" }),
+                    {
+                        status: 400,
+                        headers: { "Content-Type": "application/json" },
+                    }
+                );
+            }
+
+            const avatarExt = path.extname(platformAvatar.name).toLowerCase();
+            const safeAvatarName = sanitizeFilename(
+                `platform-avatar${avatarExt}`
+            );
+            platformAvatarPath = `./assets/writeups/${slug}/${safeAvatarName}`;
+
+            await fs.writeFile(
+                path.join(writeupDir, safeAvatarName),
+                avatarBuffer
+            );
+        }
+
         let coverPath = "";
         if (coverImage && coverImage.size > 0) {
-            const validation = validateImageFile(coverImage);
+            const validation = validateImageFile(coverImage, MAX_IMAGE_SIZE);
             if (!validation.valid) {
                 return new Response(
                     JSON.stringify({ error: validation.error }),
@@ -226,11 +252,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             }
 
             const coverBuffer = Buffer.from(await coverImage.arrayBuffer());
-
-            // Verify image content
             if (!(await verifyImageContent(coverBuffer))) {
                 return new Response(
-                    JSON.stringify({ error: "Invalid image format" }),
+                    JSON.stringify({ error: "Invalid cover image format" }),
                     {
                         status: 400,
                         headers: { "Content-Type": "application/json" },
@@ -243,23 +267,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             coverPath = `./assets/writeups/${slug}/${safeCoverName}`;
 
             await fs.writeFile(
-                path.join(
-                    process.cwd(),
-                    "public",
-                    `assets/writeups/${slug}/${safeCoverName}`
-                ),
+                path.join(writeupDir, safeCoverName),
                 coverBuffer
             );
         }
 
-        // Process additional images
         for (let i = 0; i < images.length; i++) {
             const image = images[i];
             if (!image || image.size === 0) continue;
 
-            const validation = validateImageFile(image);
+            const validation = validateImageFile(image, MAX_IMAGE_SIZE);
             if (!validation.valid) {
-                // Clean up and return error
                 await fs.rm(writeupDir, { recursive: true, force: true });
                 return new Response(
                     JSON.stringify({ error: validation.error }),
@@ -271,8 +289,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             }
 
             const imageBuffer = Buffer.from(await image.arrayBuffer());
-
-            // Verify image content
             if (!(await verifyImageContent(imageBuffer))) {
                 await fs.rm(writeupDir, { recursive: true, force: true });
                 return new Response(
@@ -293,20 +309,20 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             );
         }
 
-        // Create frontmatter
         const frontmatter = `---
 title: "${title.replace(/"/g, '\\"')}"
 published: ${new Date().toISOString().split("T")[0]}
 description: "${description.replace(/"/g, '\\"')}"
-${difficulty ? `difficulty: "${difficulty.replace(/"/g, '\\"')}"` : ""}
-${platform ? `platform: "${platform.replace(/"/g, '\\"')}"` : ""}
+platform: "${platform.replace(/"/g, '\\"')}"
+difficulty: "${difficulty.replace(/"/g, '\\"')}"
+${category ? `category: "${category.replace(/"/g, '\\"')}"` : ""}
+${platformAvatarPath ? `platformAvatar: "${platformAvatarPath}"` : ""}
 ${coverPath ? `cover: "${coverPath}"` : ""}
 draft: false
 ---
 
 `;
 
-        // Write markdown file
         const finalContent = frontmatter + mdContent;
         const mdFilePath = path.join(
             process.cwd(),
