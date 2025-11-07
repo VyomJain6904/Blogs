@@ -39,11 +39,7 @@ const WriteupsConfig: Configuration = {
 
     banners: [
         "./assets/banner1.jpg",
-        "./assets/banner2.jpg",
         "./assets/banner3.png",
-        "./assets/banner4.jpg",
-        "./assets/banner5.jpg",
-        "./assets/banner6.jpg",
         "./assets/banner7.png",
         "./assets/banner8.png",
     ],
