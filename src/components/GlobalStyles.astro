@@ -53,35 +53,200 @@ import "overlayscrollbars/overlayscrollbars.css";
         --onload-animation-interval: 100ms;
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+    }
+
     body {
         background-color: var(--background-color);
         color: var(--text-color);
+        font-family: var(--primary-font);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
+    /* Typography */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--title-font);
+        color: var(--text-color);
+        font-weight: 700;
+    }
+
+    p {
+        color: var(--text-color);
+        margin: 1rem 0;
+    }
+
+    /* Progress bar */
     .swup-progress-bar {
         height: 5px;
         background-color: var(--primary-color);
     }
 
-    /* Dracula-themed code blocks */
+    /* Code blocks - Dracula themed */
     .astro-code,
     pre {
         background-color: var(--dracula-bg) !important;
-        border: 1px solid var(--dracula-current) !important;
+        border: 1px solid var(--card-color-lighten) !important;
+        border-radius: 0.75rem;
+        overflow-x: auto;
+        padding: 1rem;
     }
 
     code {
-        color: var(--dracula-pink) !important;
-        background-color: var(--dracula-current) !important;
+        font-family: var(--code-font);
     }
 
-    /* Dracula-themed links */
+    /* Inline code */
+    :not(pre) > code {
+        background-color: rgba(68, 71, 90, 0.5) !important;
+        color: var(--dracula-cyan) !important;
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    /* Links - Dracula cyan */
     a {
         color: var(--dracula-cyan);
         transition: color 0.3s ease;
+        text-decoration: none;
     }
 
     a:hover {
         color: var(--dracula-pink);
+        text-decoration: underline;
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: var(--background-color);
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: var(--card-color-lighten);
+        border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+    }
+
+    /* Selection color */
+    ::selection {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    ::-moz-selection {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    /* Form elements */
+    input,
+    textarea,
+    select {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        border: 1px solid var(--card-color-lighten);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: var(--primary-font);
+        transition: border-color 0.3s ease;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(189, 147, 249, 0.1);
+    }
+
+    /* Button styling */
+    button {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: var(--primary-font);
+    }
+
+    button:active {
+        transform: scale(0.98);
+    }
+
+    /* Table styling */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+    }
+
+    th,
+    td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid var(--card-color-lighten);
+    }
+
+    th {
+        background-color: var(--card-color);
+        font-weight: 700;
+        color: var(--text-color);
+    }
+
+    tr:hover {
+        background-color: rgba(68, 71, 90, 0.5);
+    }
+
+    /* Utility classes */
+    .container {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    @media (min-width: 640px) {
+        .container {
+            max-width: 640px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: 768px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .container {
+            max-width: var(--page-width-lg);
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .container {
+            max-width: var(--page-width-xl);
+        }
     }
 </style>

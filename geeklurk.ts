@@ -48,7 +48,7 @@ const WriteupsConfig: Configuration = {
     bannerStyle: "LOOP",
 
     adminEnabled: true,
-    adminUsername: "g€€k!urk",
+    adminUsername: "geeklurk",
     adminPassword: process.env.ADMIN_PASSWORD,
 };
 

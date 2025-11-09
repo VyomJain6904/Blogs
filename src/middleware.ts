@@ -3,16 +3,16 @@ import WriteupsConfig from "../geeklurk";
 
 // Rate limiting storage
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const MAX_REQUESTS = 5;
-const WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS = 50; // Increased for better UX
+const WINDOW_MS = 300000; // 5 minutes instead of 1 minute
 
 // Failed login attempts tracking
 const failedAttempts = new Map<
     string,
     { count: number; blockedUntil: number }
 >();
-const MAX_FAILED_ATTEMPTS = 3;
-const BLOCK_DURATION = 900000; // 15 minutes
+const MAX_FAILED_ATTEMPTS = 5; // Increased from 3
+const BLOCK_DURATION = 600000; // 10 minutes instead of 15
 
 // Active sessions
 const activeSessions = new Map<string, { username: string; expires: number }>();
@@ -99,7 +99,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         if (!checkRateLimit(ip)) {
             return new Response(
                 JSON.stringify({
-                    error: "Too many requests. Please try again later.",
+                    error: "Too many requests. Please try again after 5 minutes.",
                 }),
                 {
                     status: 429,

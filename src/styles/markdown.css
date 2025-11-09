@@ -10,8 +10,9 @@
     @apply text-sm;
     font-family: var(--code-font) !important;
     border-radius: 4px;
-    color: var(--primary-color) !important;
-    background-color: var(--primary-color-lighten) !important;
+    color: var(--dracula-cyan) !important;
+    background-color: rgba(139, 233, 253, 0.1) !important;
+    padding: 2px 6px;
 }
 
 .article h1,
@@ -24,6 +25,8 @@
     flex-direction: row;
     align-items: center;
     position: relative;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .article h1::before,
@@ -64,6 +67,7 @@
     font-style: normal !important;
     border-radius: 0.25rem;
     background-color: var(--primary-color-transparent) !important;
+    border-left: 4px solid var(--primary-color) !important;
 }
 
 .article blockquote blockquote {
@@ -93,7 +97,13 @@
 }
 
 .article a {
-    color: var(--primary-color) !important;
+    color: var(--dracula-cyan) !important;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.article a:hover {
+    color: var(--dracula-pink) !important;
 }
 
 .article hr {
@@ -102,18 +112,49 @@
 }
 
 .article pre {
-    @apply my-3;
-    overflow: hidden !important;
+    @apply my-6 rounded-lg;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    max-width: 100%;
+    background-color: var(--dracula-bg) !important;
+    border: 1px solid var(--card-color-lighten) !important;
+    padding: 1rem !important;
+    scrollbar-width: thin;
+}
+
+.article pre::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+.article pre::-webkit-scrollbar-track {
+    background-color: var(--card-color);
+    border-radius: 4px;
+}
+
+.article pre::-webkit-scrollbar-thumb {
+    background-color: var(--card-color-lighten);
+    border-radius: 4px;
+}
+
+.article pre::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-color);
 }
 
 .article span.line {
     font-size: 14px !important;
-    line-height: normal;
+    line-height: 1.6 !important;
     font-family: var(--code-font) !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    display: block;
+    width: 100%;
 }
 
 .article code {
     counter-reset: line;
+    color: var(--dracula-cyan) !important;
 }
 
 .article span.line:before {
@@ -122,8 +163,12 @@
     direction: rtl;
     display: inline-block;
     margin-right: 1rem;
-    width: 1rem;
+    margin-left: 0.5rem;
+    width: 2rem;
+    text-align: right;
     color: rgba(255, 255, 255, 0.25);
+    user-select: none;
+    flex-shrink: 0;
 }
 
 .article span.line:last-child:empty,
@@ -132,11 +177,94 @@
 }
 
 .article p {
-    margin-top: 0.75rem;
-    margin-bottom: 0.75rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    color: var(--text-color);
 }
 
 .article .astro-code {
     border-radius: 0.75rem !important;
     scrollbar-width: thin;
+    overflow: visible !important;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Table styling */
+.article table {
+    @apply my-4 w-full border-collapse rounded-lg overflow-hidden;
+    border: 1px solid var(--card-color-lighten);
+}
+
+.article table th {
+    @apply bg-[var(--card-color-lighten)] px-4 py-2 text-left font-bold text-[var(--text-color)];
+    border: 1px solid var(--card-color-lighten);
+}
+
+.article table td {
+    @apply px-4 py-2 text-[var(--text-color)];
+    border: 1px solid var(--card-color-lighten);
+}
+
+.article table tr:hover {
+    @apply bg-[var(--card-color-lighten)];
+}
+
+/* Improved code highlighting colors */
+.article code {
+    background-color: transparent !important;
+}
+
+.article pre code {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
+/* Dracula color scheme for code */
+.article .token.keyword {
+    color: var(--dracula-pink) !important;
+}
+
+.article .token.string {
+    color: var(--dracula-yellow) !important;
+}
+
+.article .token.function {
+    color: var(--dracula-green) !important;
+}
+
+.article .token.comment {
+    color: var(--dracula-comment) !important;
+}
+
+.article .token.number {
+    color: var(--dracula-orange) !important;
+}
+
+/* List improvements */
+.article ul,
+.article ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.article li {
+    margin: 0.5rem 0;
+    line-height: 1.7;
+    color: var(--text-color);
+}
+
+/* Responsive code blocks */
+@media (max-width: 768px) {
+    .article pre {
+        @apply text-sm;
+        padding: 0.75rem !important;
+    }
+
+    .article span.line:before {
+        margin-right: 0.5rem;
+        width: 1.5rem;
+        font-size: 0.75rem;
+    }
 }
